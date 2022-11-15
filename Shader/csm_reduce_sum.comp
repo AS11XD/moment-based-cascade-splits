@@ -1,0 +1,123 @@
+#version 430
+#define NUM_MOMENTS 8
+#define THREADS_PERGROUP_X 8
+#define THREADS_PERGROUP_Y 8
+
+layout(local_size_x = THREADS_PERGROUP_X, local_size_y = THREADS_PERGROUP_Y, local_size_z = 1) in;
+uniform sampler2D depth;
+uniform sampler2D depth2;
+uniform sampler2D validity;
+uniform sampler2D minMaxOnes;
+uniform vec2 one_over_aspect;
+uniform vec2 aspect;
+uniform float near;
+uniform float far;
+uniform float height;
+uniform bool test;
+layout(rgba32f) uniform image2D reducedImg;
+layout(rgba32f) uniform image2D reducedImg2;
+uniform bool firstIteration;
+shared float sum[NUM_MOMENTS][THREADS_PERGROUP_X * THREADS_PERGROUP_Y];
+
+float LinearizeDepth(float depth) 
+{
+	if (depth >= 1.0)
+		return 1.0;
+    if (depth <= 0.0)
+		return 0.0;
+	float z = depth * 2.0 - 1.0; // back to NDC 
+    return (2.0 * near * far) / (far + near - z * (far - near));	
+}
+
+float warp(float x, float h) {
+	return (log((x) / (h * (sqrt(h * h + x * x) + h)))) / h;
+}
+
+void main() {  
+	
+	float z[NUM_MOMENTS];
+
+	if (firstIteration) {
+		if (gl_GlobalInvocationID.x < aspect.x && gl_GlobalInvocationID.y < aspect.y) {
+			float val = texture(depth, vec2(gl_GlobalInvocationID.xy + vec2(0.5))* one_over_aspect).r;
+			bool invalid = texture(validity, vec2(gl_GlobalInvocationID.xy + vec2(0.5))* one_over_aspect).r < 0.01;
+			vec3 mmo = texture(minMaxOnes, vec2(0.5)).rgb;
+			
+			if (invalid) {
+				z[0] = 0.0; 
+				z[1] = 0.0; 
+				z[2] = 0.0; 
+				z[3] = 0.0; 
+				z[4] = 0.0; 
+				z[5] = 0.0; 
+				z[6] = 0.0; 
+				z[7] = 0.0;
+			} else {
+				float warped_val = (!test) ? warp((LinearizeDepth(val) - near) / (far - near), height) : warp(val, 0.01);
+				
+				z[0] = (warped_val - mmo.x) / (mmo.y - mmo.x);
+				z[1] = z[0] * z[0];
+				z[2] = z[1] * z[0];
+				z[3] = z[2] * z[0];
+				z[4] = z[3] * z[0];
+				z[5] = z[4] * z[0];
+				z[6] = z[5] * z[0];
+				z[7] = z[6] * z[0];
+			}
+			
+		} else { 
+			z[0] = 0.0; 
+			z[1] = 0.0; 
+			z[2] = 0.0; 
+			z[3] = 0.0; 
+			z[4] = 0.0; 
+			z[5] = 0.0; 
+			z[6] = 0.0; 
+			z[7] = 0.0;
+		}		
+	} else {
+		vec4 a = texture(depth, vec2(gl_GlobalInvocationID.xy + vec2(0.5)) * one_over_aspect);
+		vec4 b = texture(depth2, vec2(gl_GlobalInvocationID.xy + vec2(0.5)) * one_over_aspect);
+		z[0] = a.r;
+		z[1] = a.g;
+		z[2] = a.b;
+		z[3] = a.a;
+		z[4] = b.r;
+		z[5] = b.g;
+		z[6] = b.b;
+		z[7] = b.a;
+	}
+
+	unsigned int tid = gl_LocalInvocationIndex;
+
+	sum[0][tid] = z[0];
+	sum[1][tid] = z[1];
+	sum[2][tid] = z[2];
+	sum[3][tid] = z[3];
+	sum[4][tid] = z[4];
+	sum[5][tid] = z[5];
+	sum[6][tid] = z[6];
+	sum[7][tid] = z[7];
+
+	barrier();
+	for (unsigned int s = (THREADS_PERGROUP_X * THREADS_PERGROUP_Y) / 2; s > 0; s >>= 1) {
+		if (tid < s) {
+			sum[0][tid] += sum[0][tid + s];
+			sum[1][tid] += sum[1][tid + s];
+			sum[2][tid] += sum[2][tid + s];
+			sum[3][tid] += sum[3][tid + s];
+			sum[4][tid] += sum[4][tid + s];
+			sum[5][tid] += sum[5][tid + s];
+			sum[6][tid] += sum[6][tid + s];
+			sum[7][tid] += sum[7][tid + s];
+		}
+		memoryBarrierShared();
+	}
+
+	if (tid == 0) {
+		ivec2 pixel = ivec2(gl_GlobalInvocationID.xy);
+		pixel /= 8;
+		imageStore(reducedImg, pixel, vec4(sum[0][0], sum[1][0], sum[2][0], sum[3][0]));
+		imageStore(reducedImg2, pixel, vec4(sum[4][0], sum[5][0], sum[6][0], sum[7][0]));
+	}
+}

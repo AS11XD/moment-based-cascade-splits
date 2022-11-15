@@ -1,0 +1,353 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="System">
+      <UniqueIdentifier>{895aa18f-a51e-45fa-92fa-b35691fe4221}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Renderer\Base">
+      <UniqueIdentifier>{db5d5d5a-58ad-4004-a9da-e78a22865977}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Base\Shader">
+      <UniqueIdentifier>{37d68f88-e6bb-4ee1-8346-a42efb514178}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Cascades">
+      <UniqueIdentifier>{fa0bdb69-6a5a-42d4-aa86-ab7057fecb73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Cascades\Shader">
+      <UniqueIdentifier>{70f73285-a916-4122-b4fa-b93c66fe173b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\loader">
+      <UniqueIdentifier>{83ffbf6d-f145-4c70-8c3f-bdc69f256a32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\Cameras">
+      <UniqueIdentifier>{da818157-80c7-42d0-89de-78fe099537f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Cascades\Shader\compute">
+      <UniqueIdentifier>{aec656f6-48fb-4b9d-bf1c-135783677b40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\Menu">
+      <UniqueIdentifier>{3b9a9c51-88ba-4780-9152-79598c5ef55d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\Menu\Shader">
+      <UniqueIdentifier>{867dbf65-2295-4f54-8498-ec2ad0e7f002}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\TextRenderer">
+      <UniqueIdentifier>{85e66b87-5882-46f7-beb2-7d4009ce6b93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\TextRenderer\Shader">
+      <UniqueIdentifier>{ac81a371-5a5f-4b31-993d-9a072a332adc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\Menu\MenuItems">
+      <UniqueIdentifier>{6fd1063d-0fac-42f2-976b-83ec52731681}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\Menu\MenuItems\Base">
+      <UniqueIdentifier>{8c1fbd50-7c24-472d-8bc4-02d9212be5ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\Menu\MenuItems\Slider">
+      <UniqueIdentifier>{ee4b9850-b2c8-412e-83d3-84de412335ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\Menu\MenuItems\Slider\Shader">
+      <UniqueIdentifier>{70129054-53fb-438b-8dc5-f4e1cc8d722b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\Menu\MenuItems\Scrollbar">
+      <UniqueIdentifier>{66c4c505-bef2-431d-9639-d804276d86ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\Menu\MenuItems\Scrollbar\Shader">
+      <UniqueIdentifier>{81e6dbb3-2c14-4eab-87ad-c77aa320bdc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\Menu\MenuItems\Checkbox">
+      <UniqueIdentifier>{f682c043-46f6-4895-a63f-bfea4523409f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\Menu\MenuItems\Checkbox\Shader">
+      <UniqueIdentifier>{bf70d737-88dc-4f6f-8741-4f2b8200ccc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\Menu\MenuItems\Button">
+      <UniqueIdentifier>{bdc03790-40fa-4e75-9340-e9ed80834a33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System\Menu\MenuItems\Button\Shader">
+      <UniqueIdentifier>{878f5bc5-116c-4f5f-80b6-720d20db9ed4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Renderer\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="CascadeRenderer.cpp">
+      <Filter>Renderer\Cascades</Filter>
+    </ClCompile>
+    <ClCompile Include="GLObjModel.cpp">
+      <Filter>System\loader</Filter>
+    </ClCompile>
+    <ClCompile Include="image.cpp">
+      <Filter>System\loader</Filter>
+    </ClCompile>
+    <ClCompile Include="nv_dds.cpp">
+      <Filter>System\loader</Filter>
+    </ClCompile>
+    <ClCompile Include="obj_loader.cpp">
+      <Filter>System\loader</Filter>
+    </ClCompile>
+    <ClCompile Include="PerlinNoise.cpp">
+      <Filter>System\loader</Filter>
+    </ClCompile>
+    <ClCompile Include="stb_image.c">
+      <Filter>System\loader</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>System\Cameras</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>System\Cameras</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuController.cpp">
+      <Filter>System\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="TextRenderer.cpp">
+      <Filter>System\TextRenderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Slider.cpp">
+      <Filter>System\Menu\MenuItems\Slider</Filter>
+    </ClCompile>
+    <ClCompile Include="Scrollbar.cpp">
+      <Filter>System\Menu\MenuItems\Scrollbar</Filter>
+    </ClCompile>
+    <ClCompile Include="CheckBox.cpp">
+      <Filter>System\Menu\MenuItems\Checkbox</Filter>
+    </ClCompile>
+    <ClCompile Include="Button.cpp">
+      <Filter>System\Menu\MenuItems\Button</Filter>
+    </ClCompile>
+    <ClCompile Include="ISlider.cpp">
+      <Filter>System\Menu\MenuItems\Slider</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Input.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Renderer\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="CascadeRenderer.h">
+      <Filter>Renderer\Cascades</Filter>
+    </ClInclude>
+    <ClInclude Include="GLObjModel.h">
+      <Filter>System\loader</Filter>
+    </ClInclude>
+    <ClInclude Include="image.h">
+      <Filter>System\loader</Filter>
+    </ClInclude>
+    <ClInclude Include="nv_dds.h">
+      <Filter>System\loader</Filter>
+    </ClInclude>
+    <ClInclude Include="obj_loader.h">
+      <Filter>System\loader</Filter>
+    </ClInclude>
+    <ClInclude Include="PerlinNoise.h">
+      <Filter>System\loader</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>System\loader</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image_write.h">
+      <Filter>System\loader</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>System\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>System\Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuController.h">
+      <Filter>System\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="TextRenderer.h">
+      <Filter>System\TextRenderer</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuItem.h">
+      <Filter>System\Menu\MenuItems\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Slider.h">
+      <Filter>System\Menu\MenuItems\Slider</Filter>
+    </ClInclude>
+    <ClInclude Include="Scrollbar.h">
+      <Filter>System\Menu\MenuItems\Scrollbar</Filter>
+    </ClInclude>
+    <ClInclude Include="CheckBox.h">
+      <Filter>System\Menu\MenuItems\Checkbox</Filter>
+    </ClInclude>
+    <ClInclude Include="Button.h">
+      <Filter>System\Menu\MenuItems\Button</Filter>
+    </ClInclude>
+    <ClInclude Include="ISlider.h">
+      <Filter>System\Menu\MenuItems\Slider</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="fps.vert">
+      <Filter>Renderer\Base\Shader</Filter>
+    </None>
+    <None Include="fps.frag">
+      <Filter>Renderer\Base\Shader</Filter>
+    </None>
+    <None Include="csm_light.vert">
+      <Filter>Renderer\Cascades\Shader</Filter>
+    </None>
+    <None Include="csm_show_frustum.frag">
+      <Filter>Renderer\Cascades\Shader</Filter>
+    </None>
+    <None Include="csm_show_frustum.vert">
+      <Filter>Renderer\Cascades\Shader</Filter>
+    </None>
+    <None Include="csm_obj.vert">
+      <Filter>Renderer\Cascades\Shader</Filter>
+    </None>
+    <None Include="csm_visualize_depth.frag">
+      <Filter>Renderer\Cascades\Shader</Filter>
+    </None>
+    <None Include="csm_visualize_depth.vert">
+      <Filter>Renderer\Cascades\Shader</Filter>
+    </None>
+    <None Include="csm_createsm.frag">
+      <Filter>Renderer\Cascades\Shader</Filter>
+    </None>
+    <None Include="csm_createsm.vert">
+      <Filter>Renderer\Cascades\Shader</Filter>
+    </None>
+    <None Include="csm_light.frag">
+      <Filter>Renderer\Cascades\Shader</Filter>
+    </None>
+    <None Include="csm_visualize_compute_tex.frag">
+      <Filter>Renderer\Cascades\Shader</Filter>
+    </None>
+    <None Include="csm_visualize_compute_tex.vert">
+      <Filter>Renderer\Cascades\Shader</Filter>
+    </None>
+    <None Include="csm_obj.frag">
+      <Filter>Renderer\Cascades\Shader</Filter>
+    </None>
+    <None Include="csm_compute_cascades.comp">
+      <Filter>Renderer\Cascades\Shader\compute</Filter>
+    </None>
+    <None Include="csm_createdepth.frag">
+      <Filter>Renderer\Cascades\Shader</Filter>
+    </None>
+    <None Include="csm_createdepth.vert">
+      <Filter>Renderer\Cascades\Shader</Filter>
+    </None>
+    <None Include="csm_show_frustum_casc.frag">
+      <Filter>Renderer\Cascades\Shader</Filter>
+    </None>
+    <None Include="csm_show_frustum_casc.vert">
+      <Filter>Renderer\Cascades\Shader</Filter>
+    </None>
+    <None Include="csm_reduce_min_max.comp">
+      <Filter>Renderer\Cascades\Shader\compute</Filter>
+    </None>
+    <None Include="csm_create_test_reduce_sum.comp">
+      <Filter>Renderer\Cascades\Shader\compute</Filter>
+    </None>
+    <None Include="csm_create_test_reduce_min_max.comp">
+      <Filter>Renderer\Cascades\Shader\compute</Filter>
+    </None>
+    <None Include="csm_calculate_splits_fixed.comp">
+      <Filter>Renderer\Cascades\Shader\compute</Filter>
+    </None>
+    <None Include="csm_calculate_splits_min_max.comp">
+      <Filter>Renderer\Cascades\Shader\compute</Filter>
+    </None>
+    <None Include="csm_calculate_splits_moments.comp">
+      <Filter>Renderer\Cascades\Shader\compute</Filter>
+    </None>
+    <None Include="csm_calculate_boundingbox_fitting.comp">
+      <Filter>Renderer\Cascades\Shader\compute</Filter>
+    </None>
+    <None Include="menu.vert">
+      <Filter>System\Menu\Shader</Filter>
+    </None>
+    <None Include="menu.frag">
+      <Filter>System\Menu\Shader</Filter>
+    </None>
+    <None Include="text.frag">
+      <Filter>System\TextRenderer\Shader</Filter>
+    </None>
+    <None Include="text.vert">
+      <Filter>System\TextRenderer\Shader</Filter>
+    </None>
+    <None Include="sliderBase.frag">
+      <Filter>System\Menu\MenuItems\Slider\Shader</Filter>
+    </None>
+    <None Include="sliderBase.vert">
+      <Filter>System\Menu\MenuItems\Slider\Shader</Filter>
+    </None>
+    <None Include="slider.vert">
+      <Filter>System\Menu\MenuItems\Slider\Shader</Filter>
+    </None>
+    <None Include="slider.frag">
+      <Filter>System\Menu\MenuItems\Slider\Shader</Filter>
+    </None>
+    <None Include="scrollbar.frag">
+      <Filter>System\Menu\MenuItems\Scrollbar\Shader</Filter>
+    </None>
+    <None Include="scrollbar.vert">
+      <Filter>System\Menu\MenuItems\Scrollbar\Shader</Filter>
+    </None>
+    <None Include="scrollbarBase.vert">
+      <Filter>System\Menu\MenuItems\Scrollbar\Shader</Filter>
+    </None>
+    <None Include="scrollbarBase.frag">
+      <Filter>System\Menu\MenuItems\Scrollbar\Shader</Filter>
+    </None>
+    <None Include="checkbox.vert">
+      <Filter>System\Menu\MenuItems\Checkbox\Shader</Filter>
+    </None>
+    <None Include="checkbox.frag">
+      <Filter>System\Menu\MenuItems\Checkbox\Shader</Filter>
+    </None>
+    <None Include="checkboxBase.vert">
+      <Filter>System\Menu\MenuItems\Checkbox\Shader</Filter>
+    </None>
+    <None Include="checkboxBase.frag">
+      <Filter>System\Menu\MenuItems\Checkbox\Shader</Filter>
+    </None>
+    <None Include="button.vert">
+      <Filter>System\Menu\MenuItems\Button\Shader</Filter>
+    </None>
+    <None Include="button.frag">
+      <Filter>System\Menu\MenuItems\Button\Shader</Filter>
+    </None>
+    <None Include="csm_reduce_sum_one_for_all.comp">
+      <Filter>Renderer\Cascades\Shader\compute</Filter>
+    </None>
+    <None Include="csm_reduce_min_max_ones.comp">
+      <Filter>Renderer\Cascades\Shader\compute</Filter>
+    </None>
+    <None Include="csm_reduce_sum.comp">
+      <Filter>Renderer\Cascades\Shader\compute</Filter>
+    </None>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{D591F7E4-E1C4-4D9F-9C4B-3CFD5F1CE88C}</ProjectGuid>
+    <RootNamespace>Shader</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>.\libs\freeglut\include;.\libs\glm;.\libs\glew-2.1.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>freeglut.lib;glew32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\libs\freeglut\lib\x64;.\libs\glew-2.1.0\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>.\libs\freeglut\include;.\libs\glm;.\libs\glew-2.1.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>.\libs\freeglut\lib\x64;.\libs\glew-2.1.0\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>freeglut.lib;glew32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Button.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CascadeRenderer.cpp" />
+    <ClCompile Include="CheckBox.cpp" />
+    <ClCompile Include="GLObjModel.cpp" />
+    <ClCompile Include="image.cpp" />
+    <ClCompile Include="Input.cpp" />
+    <ClCompile Include="ISlider.cpp" />
+    <ClCompile Include="Light.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MenuController.cpp" />
+    <ClCompile Include="nv_dds.cpp" />
+    <ClCompile Include="obj_loader.cpp" />
+    <ClCompile Include="PerlinNoise.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="Scrollbar.cpp" />
+    <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="Slider.cpp" />
+    <ClCompile Include="stb_image.c" />
+    <ClCompile Include="TextRenderer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Button.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="CascadeRenderer.h" />
+    <ClInclude Include="CheckBox.h" />
+    <ClInclude Include="GLObjModel.h" />
+    <ClInclude Include="image.h" />
+    <ClInclude Include="Input.h" />
+    <ClInclude Include="ISlider.h" />
+    <ClInclude Include="Light.h" />
+    <ClInclude Include="MenuController.h" />
+    <ClInclude Include="MenuItem.h" />
+    <ClInclude Include="nv_dds.h" />
+    <ClInclude Include="obj_loader.h" />
+    <ClInclude Include="PerlinNoise.h" />
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="Scrollbar.h" />
+    <ClInclude Include="Shader.h" />
+    <ClInclude Include="Slider.h" />
+    <ClInclude Include="stb_image.h" />
+    <ClInclude Include="stb_image_write.h" />
+    <ClInclude Include="TextRenderer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="button.frag" />
+    <None Include="button.vert" />
+    <None Include="checkbox.frag" />
+    <None Include="checkbox.vert" />
+    <None Include="checkboxBase.frag" />
+    <None Include="checkboxBase.vert" />
+    <None Include="csm_calculate_boundingbox_fitting.comp" />
+    <None Include="csm_calculate_splits_fixed.comp" />
+    <None Include="csm_calculate_splits_min_max.comp" />
+    <None Include="csm_calculate_splits_moments.comp" />
+    <None Include="csm_compute_cascades.comp" />
+    <None Include="csm_createdepth.frag" />
+    <None Include="csm_createdepth.vert" />
+    <None Include="csm_createsm.frag" />
+    <None Include="csm_createsm.vert" />
+    <None Include="csm_create_test_reduce_min_max.comp" />
+    <None Include="csm_create_test_reduce_sum.comp" />
+    <None Include="csm_light.frag" />
+    <None Include="csm_light.vert" />
+    <None Include="csm_obj.frag" />
+    <None Include="csm_obj.vert" />
+    <None Include="csm_reduce_min_max.comp" />
+    <None Include="csm_reduce_min_max_ones.comp" />
+    <None Include="csm_reduce_sum.comp" />
+    <None Include="csm_show_frustum.frag" />
+    <None Include="csm_show_frustum.vert" />
+    <None Include="csm_reduce_sum_one_for_all.comp" />
+    <None Include="csm_show_frustum_casc.frag" />
+    <None Include="csm_show_frustum_casc.vert" />
+    <None Include="csm_visualize_compute_tex.frag" />
+    <None Include="csm_visualize_compute_tex.vert" />
+    <None Include="csm_visualize_depth.frag" />
+    <None Include="csm_visualize_depth.vert" />
+    <None Include="menu.frag" />
+    <None Include="menu.vert" />
+    <None Include="scrollbar.frag" />
+    <None Include="scrollbar.vert" />
+    <None Include="scrollbarBase.frag" />
+    <None Include="scrollbarBase.vert" />
+    <None Include="slider.frag" />
+    <None Include="slider.vert" />
+    <None Include="sliderBase.frag" />
+    <None Include="sliderBase.vert" />
+    <None Include="fps.frag" />
+    <None Include="fps.vert" />
+    <None Include="text.frag" />
+    <None Include="text.vert" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

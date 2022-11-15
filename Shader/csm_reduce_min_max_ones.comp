@@ -1,0 +1,84 @@
+#version 430
+#define THREADS_PERGROUP_X 8
+#define THREADS_PERGROUP_Y 8
+
+layout(local_size_x = THREADS_PERGROUP_X, local_size_y = THREADS_PERGROUP_Y, local_size_z = 1) in;
+uniform sampler2D depth;
+uniform sampler2D validity;
+uniform vec2 one_over_aspect;
+uniform vec2 aspect;
+uniform float near;
+uniform float far;
+uniform float height;
+uniform bool test;
+layout(rgba32f) uniform image2D reducedImg;
+uniform bool firstIteration;
+shared float res[3][THREADS_PERGROUP_X * THREADS_PERGROUP_Y];
+
+float LinearizeDepth(float depth) 
+{
+	if (depth >= 1.0)
+		return 1.0;
+    if (depth <= 0.0)
+		return 0.0;
+	float z = depth * 2.0 - 1.0; // back to NDC 
+    return (2.0 * near * far) / (far + near - z * (far - near));	
+}
+
+float warp(float x, float h) {
+	return (log((x) / (h * (sqrt(h * h + x * x) + h)))) / h;
+}
+
+void main() {  
+	
+	float a[3];
+
+	if (firstIteration) {
+		if (gl_GlobalInvocationID.x < aspect.x && gl_GlobalInvocationID.y < aspect.y) {
+			float val = texture(depth, vec2(gl_GlobalInvocationID.xy + vec2(0.5))* one_over_aspect).r;
+			bool invalid = texture(validity, vec2(gl_GlobalInvocationID.xy + vec2(0.5))* one_over_aspect).r < 0.01;
+			float lin_val = (LinearizeDepth(val) - near) / (far - near);
+			
+			if (invalid) {
+				a[0] = 1.0 / 0.0;
+				a[1] = -1.0 / 0.0;
+				a[2] = 0.0;
+			} else {
+				a[0] = ((!test) ? warp(lin_val, height) : warp(val, 0.01));
+				a[1] = a[0];
+				a[2] = 1.0;
+			}
+		} else { 
+			a[0] = 1.0 / 0.0;
+			a[1] = -1.0 / 0.0;
+			a[2] = 0.0;
+		}		
+	} else {
+		vec4 val = texture(depth, vec2(gl_GlobalInvocationID.xy + vec2(0.5)) * one_over_aspect);
+		a[0] = val.x;
+		a[1] = val.y;
+		a[2] = val.z;
+	}
+
+	unsigned int tid = gl_LocalInvocationIndex;
+
+	res[0][tid] = a[0];
+	res[1][tid] = a[1];
+	res[2][tid] = a[2];
+
+	barrier();
+	for (unsigned int s = (THREADS_PERGROUP_X * THREADS_PERGROUP_Y) / 2; s > 0; s >>= 1) {
+		if (tid < s) {
+			res[0][tid] = min(res[0][tid], res[0][tid + s]);
+			res[1][tid] = max(res[1][tid], res[1][tid + s]);
+			res[2][tid] += res[2][tid + s];
+		}
+		memoryBarrierShared();
+	}
+
+	if (tid == 0) {
+		ivec2 pixel = ivec2(gl_GlobalInvocationID.xy);
+		pixel /= 8;
+		imageStore(reducedImg, pixel, vec4(res[0][0], res[1][0], res[2][0], 0.0));
+	}
+}

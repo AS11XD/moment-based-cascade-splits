@@ -1,0 +1,207 @@
+#version 430
+#define kernel_size 3
+
+layout(local_size_x = 32, local_size_y = 1, local_size_z = 1) in;
+layout(std430, binding = 3) buffer matVP
+{
+	mat4 vp[];
+};
+layout(std430, binding = 4) buffer splitVector
+{
+	vec2 splits[];
+};
+uniform mat4 camP;
+uniform mat4 camV;
+uniform int MAX_CASCADES;
+uniform vec3 pos;
+uniform vec3 dir;
+uniform vec3 up;
+uniform float zNear;
+uniform float zFar;
+uniform vec2 one_over_aspect;
+uniform bool bbfit;
+uniform	float overlap;
+uniform sampler2D boundingBoxFit[16];
+uniform sampler2D boundingBoxFit2[16];
+
+vec3 bias;
+
+float minComp(int comp, vec3 vert[8])
+{
+	float minV = vert[0][comp];
+	for (int i = 1; i < 8; i++) {
+		if (minV > vert[i][comp])
+			minV = vert[i][comp];
+	}
+	return minV;
+}
+
+float maxComp(int comp, vec3 vert[8])
+{
+	float maxV = vert[0][comp];
+	for (int i = 1; i < 8; i++) {
+		if (maxV < vert[i][comp])
+			maxV = vert[i][comp];
+	}
+	return maxV;
+}
+
+vec3 average(vec3 vert[8])
+{
+	vec3 av = vec3(0.0);
+	for (int i = 0; i < 8; i++)
+		av += vert[i];
+
+	return av / 8.0;
+}
+
+
+vec3[8] genUnitCube(float xmin, float xmax, float ymin, float ymax, float zmin, float zmax) {
+	vec3 vertices[8];
+	vertices[0] = vec3(xmin, ymin, zmin);
+	vertices[1] = vec3(xmax, ymin, zmin);
+	vertices[2] = vec3(xmin, ymax, zmin);
+	vertices[3] = vec3(xmin, ymin, zmax);
+	vertices[4] = vec3(xmax, ymax, zmin);
+	vertices[5] = vec3(xmax, ymin, zmax);
+	vertices[6] = vec3(xmin, ymax, zmax);
+	vertices[7] = vec3(xmax, ymax, zmax);
+	return vertices;
+}
+
+mat4 lookAtRH(vec3 eye, vec3 direction, vec3 laup) {
+	vec3 center = eye - direction;
+	vec3 f = normalize(center - eye);
+	vec3 s = normalize(cross(f, up));
+	vec3 u = cross(s, f);
+
+	mat4 v = mat4(1.0);
+	v[0][0] = s.x;
+	v[1][0] = s.y;
+	v[2][0] = s.z;
+	v[0][1] = u.x;
+	v[1][1] = u.y;
+	v[2][1] = u.z;
+	v[0][2] =-f.x;
+	v[1][2] =-f.y;
+	v[2][2] =-f.z;
+	v[3][0] =-dot(s, eye);
+	v[3][1] =-dot(u, eye);
+	v[3][2] = dot(f, eye);
+	return v;
+}
+
+mat4 lookAtLH(vec3 eye, vec3 direction, vec3 laup) {
+	vec3 center = eye - direction;
+	vec3 f = normalize(center - eye);
+	vec3 s = normalize(cross(up, f));
+	vec3 u = cross(f, s);
+
+	mat4 v = mat4(1.0);
+	v[0][0] = s.x;
+	v[1][0] = s.y;
+	v[2][0] = s.z;
+	v[0][1] = u.x;
+	v[1][1] = u.y;
+	v[2][1] = u.z;
+	v[0][2] = f.x;
+	v[1][2] = f.y;
+	v[2][2] = f.z;
+	v[3][0] = -dot(s, eye);
+	v[3][1] = -dot(u, eye);
+	v[3][2] = -dot(f, eye);
+	return v;
+}
+
+mat4 ortho(float left, float right, float bottom, float top, float nzNear, float nzFar) {
+	mat4 p = mat4(1.0);
+	p[0][0] = 2.0 / (right - left);
+	p[1][1] = 2.0 / (top - bottom);
+	p[2][2] = - 2.0 / (nzFar - nzNear);
+	p[3][0] = - (right + left) / (right - left);
+	p[3][1] = - (top + bottom) / (top - bottom);
+	p[3][2] = - (nzFar + nzNear) / (nzFar - nzNear);
+	return p;
+}
+
+void main() { 
+
+	int index = int(gl_LocalInvocationID);
+	if (index >= MAX_CASCADES)
+		return;
+			
+	vec3[8] vertices = genUnitCube(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+
+	mat4 matP = mat4(0.0);
+	mat4 inv;
+	if (bbfit) {
+		vec4 nxy = texture(boundingBoxFit[index], vec2(0.5)).rgba;
+		vec2 nz = texture(boundingBoxFit2[index], vec2(0.5)).rg + vec2(-one_over_aspect.x * one_over_aspect.y * 10, one_over_aspect.x * one_over_aspect.y * 10);
+		splits[index] = nz.rg;
+
+		mat4 fitBB = mat4(1.0);
+		fitBB[0][0] = nxy.g - nxy.r;
+		fitBB[1][1] = nxy.a - nxy.b;
+		fitBB[2][2] = 1.0;
+		fitBB[3][0] = fitBB[0][0] + (nxy.r * 2.0 - 1.0);
+		fitBB[3][1] = fitBB[1][1] + (nxy.b * 2.0 - 1.0);
+		fitBB[3][2] = 0.0;
+
+		float nNear, nFar;
+		nNear = nz.r * (zFar - zNear) + zNear;
+		nFar = nz.g * (zFar - zNear) + zNear;
+		
+		matP[0][0] = camP[0][0];
+		matP[1][1] = camP[1][1];
+		matP[2][2] = -(nFar + nNear) / (nFar - nNear);
+		matP[2][3] = camP[2][3];
+		matP[3][2] = -(2.0 * nFar * nNear) / (nFar - nNear);
+
+		inv = inverse(matP * camV) * fitBB;
+	} else {
+		float nNear, nFar;
+		if (index > 0)
+			nNear = (splits[index].x - overlap  * (splits[index].y - splits[index].x)) * (zFar - zNear) + zNear;
+		else
+			nNear = splits[index].x * (zFar - zNear) + zNear;
+
+		if (index < MAX_CASCADES - 1)
+			nFar = (splits[index].y + overlap * (splits[index].y - splits[index].x)) * (zFar - zNear) + zNear;
+		else
+			nFar = splits[index].y * (zFar - zNear) + zNear;
+		
+		matP[0][0] = camP[0][0];
+		matP[1][1] = camP[1][1];
+		matP[2][2] = -(nFar + nNear) / (nFar - nNear);
+		matP[2][3] = camP[2][3];
+		matP[3][2] = -(2.0 * nFar * nNear) / (nFar - nNear);
+
+		inv = inverse(matP * camV);
+	}
+	for (int i = 0; i < 8; i++) {
+		vec4 tmp = inv * vec4(vertices[i], 1.0);
+		vertices[i] = vec3(tmp / tmp.w);
+	}
+	
+	vec3 mdir = normalize(dir);
+	mat4 matV = lookAtRH(average(vertices) + mdir * (maxComp(2, vertices) - minComp(2, vertices)), mdir, up);
+	
+	for (int i = 0 ; i < 8; i++) {
+		vertices[i] = vec3(matV * vec4(vertices[i], 1.0));
+	}
+		
+	
+	int pixel_over = kernel_size / 2;
+	bias.xy = (pixel_over + 0.5) * one_over_aspect * 0.0;
+	bias.z = 0.0;
+	
+	vec2 xpos = vec2(minComp(0, vertices), maxComp(0, vertices));
+	vec2 ypos = vec2(minComp(1, vertices), maxComp(1, vertices));
+	vec2 zpos = vec2(-maxComp(2, vertices), -minComp(2, vertices));
+	
+	matP = ortho(xpos.x - bias.x, xpos.y + bias.x,
+				 ypos.x - bias.y, ypos.y + bias.y,
+				 zpos.x - bias.z, zpos.y + bias.z);
+
+	vp[index] = matP * matV;
+}

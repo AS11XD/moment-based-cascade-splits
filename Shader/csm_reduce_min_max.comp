@@ -1,0 +1,69 @@
+#version 430
+#define THREADS_PERGROUP_X 8
+#define THREADS_PERGROUP_Y 8
+
+layout(local_size_x = THREADS_PERGROUP_X, local_size_y = THREADS_PERGROUP_Y, local_size_z = 1) in;
+uniform sampler2D depth;
+uniform sampler2D validity;
+uniform vec2 one_over_aspect;
+uniform vec2 aspect;
+uniform float near;
+uniform float far;
+uniform bool test;
+layout(rgba32f) uniform image2D reducedImg;
+uniform bool firstIteration;
+shared float minMax[THREADS_PERGROUP_X * THREADS_PERGROUP_Y][2];
+float eps = 0.0001;
+
+float LinearizeDepth(float depth) 
+{
+    float z = depth * 2.0 - 1.0; // back to NDC 
+    return (2.0 * near * far) / (far + near - z * (far - near));	
+}
+
+void main() {  
+	
+	float z[2];
+
+	if (firstIteration) {
+		if (gl_GlobalInvocationID.x < aspect.x && gl_GlobalInvocationID.y < aspect.y) {
+			z[0] = texture(depth, vec2(gl_GlobalInvocationID.xy + vec2(0.5))* one_over_aspect).r;
+			bool invalid = texture(validity, vec2(gl_GlobalInvocationID.xy + vec2(0.5))* one_over_aspect).r < 0.01;
+			
+			if (!test && invalid) {
+				z[0] = 1.0 / 0.0;
+				z[1] = - 1.0 / 0.0;
+			} else {
+				z[1] = z[0];
+			}
+		} else { 
+			z[0] = 1.0 / 0.0;
+			z[1] = -1.0 / 0.0;
+		}
+	} else {
+		vec2 pixel = vec2(gl_GlobalInvocationID.xy + vec2(0.5));
+		vec2 v = texture(depth, pixel * one_over_aspect).rg;
+		z[0] = v.x;
+		z[1] = v.y;
+	}
+
+	unsigned int tid = gl_LocalInvocationIndex;
+	
+	minMax[tid][0] = z[0];
+	minMax[tid][1] = z[1];
+	
+	barrier();
+	for (unsigned int s = (THREADS_PERGROUP_X * THREADS_PERGROUP_Y) / 2; s > 0; s >>= 1) {
+		if (tid < s) {
+			minMax[tid][0] = min(minMax[tid][0], minMax[tid + s][0]);
+			minMax[tid][1] = max(minMax[tid][1], minMax[tid + s][1]);
+		}
+		memoryBarrierShared();
+	}
+
+	if (tid == 0) {
+		ivec2 pixel = ivec2(gl_GlobalInvocationID.xy);
+		pixel /= 8;
+		imageStore(reducedImg, pixel, vec4(minMax[0][0], minMax[0][1], 0.0, 0.0));
+	}
+}

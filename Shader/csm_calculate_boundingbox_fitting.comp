@@ -1,0 +1,108 @@
+#version 460
+#define THREADS_PERGROUP_X 8
+#define THREADS_PERGROUP_Y 8
+#define MAX_CASCADE 4
+//#extension GL_EXT_control_flow_attributes : enable
+
+layout(local_size_x = THREADS_PERGROUP_X, local_size_y = THREADS_PERGROUP_Y, local_size_z = MAX_CASCADE) in;
+layout(std430, binding = 4) buffer splitVector
+{
+	vec2 splits[];
+};
+uniform sampler2D depth[MAX_CASCADE];
+uniform sampler2D depth2[MAX_CASCADE];
+uniform vec2 one_over_aspect;
+uniform vec2 aspect;
+uniform float near;
+uniform float far;
+layout(rgba32f) uniform image2D reducedImg[MAX_CASCADE];
+layout(rgba32f) uniform image2D reducedImg2[MAX_CASCADE];
+uniform bool firstIteration;
+shared float minMax[3][MAX_CASCADE][2][THREADS_PERGROUP_X * THREADS_PERGROUP_Y];
+float eps = 0.0001;
+
+float LinearizeDepth(float depth) 
+{
+    float z = depth * 2.0 - 1.0; // back to NDC 
+    return (2.0 * near * far) / (far + near - z * (far - near));	
+}
+
+void main() {  
+	
+	float v[3][2];
+	
+	unsigned int casc = gl_LocalInvocationID.z;
+
+	if (firstIteration) {
+		if (gl_GlobalInvocationID.x < aspect.x && gl_GlobalInvocationID.y < aspect.y) {
+			vec2 pos = vec2(gl_GlobalInvocationID.xy + vec2(0.5))* one_over_aspect;
+			float d = texture(depth[0], pos).r;
+			float linz = (LinearizeDepth(d) - near) / (far - near);
+			
+			if (linz < splits[casc].x || linz > splits[casc].y) {
+				v[0][0] = 1.0 / 0.0;
+				v[0][1] = - 1.0 / 0.0;
+				v[1][0] = 1.0 / 0.0;
+				v[1][1] = - 1.0 / 0.0;
+				v[2][0] = 1.0 / 0.0;
+				v[2][1] = - 1.0 / 0.0;
+			} 
+			else {
+				v[0][0] = pos.x;
+				v[0][1] = pos.x;
+				v[1][0] = pos.y;
+				v[1][1] = pos.y;
+				v[2][0] = linz;
+				v[2][1] = linz;
+			}
+		} else { 
+			v[0][0] = 1.0 / 0.0;
+			v[0][1] = - 1.0 / 0.0;
+			v[1][0] = 1.0 / 0.0;
+			v[1][1] = - 1.0 / 0.0;
+			v[2][0] = 1.0 / 0.0;
+			v[2][1] = - 1.0 / 0.0;
+		}
+	} else {
+		vec2 pixel = vec2(gl_GlobalInvocationID.xy + vec2(0.5));
+		vec4 xyv = texture(depth[casc], pixel * one_over_aspect).rgba;
+		vec2 zv = texture(depth2[casc], pixel * one_over_aspect).rg;
+		v[0][0] = xyv.r;
+		v[0][1] = xyv.g;
+		v[1][0] = xyv.b;
+		v[1][1] = xyv.a;
+		v[2][0] = zv.r;
+		v[2][1] = zv.g;
+	}
+
+	unsigned int tid = gl_LocalInvocationID.y * THREADS_PERGROUP_X + gl_LocalInvocationID.x;
+	
+	minMax[0][casc][0][tid] = v[0][0];
+	minMax[0][casc][1][tid] = v[0][1];
+	minMax[1][casc][0][tid] = v[1][0];
+	minMax[1][casc][1][tid] = v[1][1];
+	minMax[2][casc][0][tid] = v[2][0];
+	minMax[2][casc][1][tid] = v[2][1];
+	
+	barrier();
+	//[[unroll]]
+	for (unsigned int s = (THREADS_PERGROUP_X * THREADS_PERGROUP_Y) / 2; s > 0; s >>= 1) {
+		if (tid < s) {
+			minMax[0][casc][0][tid] = min(minMax[0][casc][0][tid], minMax[0][casc][0][tid + s]);
+			minMax[0][casc][1][tid] = max(minMax[0][casc][1][tid], minMax[0][casc][1][tid + s]);
+			minMax[1][casc][0][tid] = min(minMax[1][casc][0][tid], minMax[1][casc][0][tid + s]);
+			minMax[1][casc][1][tid] = max(minMax[1][casc][1][tid], minMax[1][casc][1][tid + s]);
+			minMax[2][casc][0][tid] = min(minMax[2][casc][0][tid], minMax[2][casc][0][tid + s]);
+			minMax[2][casc][1][tid] = max(minMax[2][casc][1][tid], minMax[2][casc][1][tid + s]);
+								    
+		}
+		memoryBarrierShared();
+	}
+
+	if (tid == 0) {
+		ivec2 pixel = ivec2(gl_GlobalInvocationID.xy);
+		pixel /= 8;
+		imageStore(reducedImg[casc], pixel, vec4(minMax[0][casc][0][0], minMax[0][casc][1][0], minMax[1][casc][0][0], minMax[1][casc][1][0]));
+		imageStore(reducedImg2[casc], pixel, vec4(minMax[2][casc][0][0], minMax[2][casc][1][0], 0.0, 0.0));
+	}
+}

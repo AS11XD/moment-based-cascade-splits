@@ -1,0 +1,51 @@
+#version 430
+layout(local_size_x = 32, local_size_y = 1, local_size_z = 1) in;
+layout(std430, binding = 4) buffer splitVector
+{
+	vec2 splits[];
+};
+uniform int MAX_CASCADES;
+uniform float near;
+uniform float far;
+uniform sampler2D reducedImg;
+shared vec2 minMax;
+vec2 bias = vec2(0.0, 0.0);
+float weight = 0.6;
+
+float LinearizeDepth(float depth) 
+{
+    float z = depth * 2.0 - 1.0; // back to NDC 
+    return (2.0 * near * far) / (far + near - z * (far - near));	
+}
+
+void main() {  
+	int index = int(gl_LocalInvocationID);
+	if (index >= MAX_CASCADES)
+		return;
+	
+	if (index == 0) {
+		minMax = texture(reducedImg, vec2(0.5, 0.5)).rg;
+		if (minMax.x > 1.0)
+			minMax.x = 1.0;
+
+		if (minMax.y > 1.0)
+			minMax.y = 1.0;
+
+		if (minMax.x < 0.0)
+			minMax.x = 0.0;
+			
+		if (minMax.y < 0.0)
+			minMax.y = 0.0;
+
+		minMax.x = LinearizeDepth(minMax.x);
+		minMax.y = LinearizeDepth(minMax.y);
+	}
+	barrier();
+	vec2 clog = vec2(minMax.x * pow((minMax.y / minMax.x), float(index) / MAX_CASCADES), minMax.x * pow((minMax.y / minMax.x), float(index + 1) / MAX_CASCADES));
+	vec2 cuni = vec2(minMax.x + (minMax.y - minMax.x) * (float(index) / MAX_CASCADES), minMax.x + (minMax.y - minMax.x) * (float(index + 1) / MAX_CASCADES));
+	vec2 spli = (vec2(weight * clog + (1.0 - weight) * cuni)  - near) / (far - near);
+	spli += bias;
+	spli.x = max(spli.x, 0.0);
+	spli.y = min(spli.y, 1.0);
+	splits[index] = spli;
+}
